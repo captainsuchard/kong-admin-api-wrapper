@@ -29,3 +29,12 @@ func NewKongClient(host, port string, useTLS bool) error {
 	}
 	return nil
 }
+
+// SetKongClient allows the user to supply their own kong client
+func SetKongClient(client *kong.Client) error {
+	if client == nil {
+		return fmt.Errorf("client cannot be nil")
+	}
+	vars.KongClient = client
+	return nil
+}

@@ -2,6 +2,7 @@ package setup
 
 import (
 	"github.com/captainsuchard/kong-admin-api-wrapper/vars"
+	"github.com/kong/go-kong/kong"
 	"testing"
 )
 
@@ -60,5 +61,34 @@ func TestNewKongClientEmptyPort(t *testing.T) {
 	err := NewKongClient(kongHost, kongPort, useTLS)
 	if err == nil {
 		t.Error("expected error setting up kong client, got nil")
+	}
+}
+
+func TestSetKongClient(t *testing.T) {
+	kongAdminApiUrl := "https://localhost:8001"
+	kongClient, err := kong.NewClient(&kongAdminApiUrl, nil)
+	if err != nil {
+		t.Errorf("error creating kong client: %v", err)
+	}
+	err = SetKongClient(kongClient)
+	if err != nil {
+		t.Errorf("error setting custom kong client: %v", err)
+	}
+
+}
+
+func BenchmarkSetKongClient(b *testing.B) {
+	b.StopTimer()
+	kongAdminApiUrl := "https://localhost:8001"
+	kongClient, err := kong.NewClient(&kongAdminApiUrl, nil)
+	if err != nil {
+		b.Errorf("error creating kong client: %v", err)
+	}
+	b.StartTimer()
+	for i := 0; i < b.N; i++ {
+		err := SetKongClient(kongClient)
+		if err != nil {
+			b.Errorf("error setting custom kong client: %v", err)
+		}
 	}
 }
